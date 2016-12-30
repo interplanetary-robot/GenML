@@ -15,7 +15,7 @@ end
 function (::Type{FullyConnectedLayer{F,i,o,tf}}){F,i,o,tf}(randomizationfunction::Function = zeros)
   biasvector = randomizationfunction(F, o)
   transitionmatrix = randomizationfunction(F, o, i)
-  FullyConnectedLayer{F, i, o, tf}(biasvector, transitionmatrix)
+  FullyConnectedLayer{F,i,o,tf,l}(biasvector, transitionmatrix)
 end
 
 #implementation of the interfaces

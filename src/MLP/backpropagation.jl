@@ -38,27 +38,6 @@ function backpropagationoptimize{F,LD}(mlp::MultilayerPerceptron{F,LD}, input::V
   delta_layer = (d(cost))(answers, res)
 
   backpropagate!(mlp, input, res, delta_layer, Val{true})
-#=
-  #next calculate the matrix deltas and the nextlayer delta
-  for l_idx = (length(LD) - 1) : -1 : 1
-    #also calculate the transitions update.
-    if l_idx == 1
-      matrix_prefix_delta = delta_layer .* (dxasy(sigmoid))(layer_answers)
-      transitions_delta = matrix_prefix_delta * (input')
-      mlp.layers[l_idx].bias -= alpha * matrix_prefix_delta
-      mlp.layers[l_idx].transition -=  alpha * transitions_delta
-    else
-      matrix_prefix_delta = delta_layer .* (dxasy(sigmoid))(layer_answers)
-      delta_previous_layer = (mlp.layers[l_idx].transition') * matrix_prefix_delta
-      transitions_delta = matrix_prefix_delta * (b[l_idx - 1]')
-      mlp.layers[l_idx].bias -= alpha * matrix_prefix_delta
-      mlp.layers[l_idx].transition -=  alpha * transitions_delta # + lambda * mlp.transitions[l_idx - 1])
-      #and then update the layer (but avoid changing the bias vector)
-      layer_answers = b[l_idx - 1]
-      delta_layer = delta_previous_layer
-    end
-  end
-=#
 end
 
 

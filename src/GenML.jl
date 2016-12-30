@@ -13,6 +13,10 @@ parameters{T <: MLAlgorithm}(::Type{T}) = throw(MethodError(parameters, (Type{T}
 flatten!{F}(::Vector{F}, ::MLAlgorithm{F}, offset::Integer = 0) = throw(MethodError(flatten!, (Vector{F}, MLAlgorithm{F}, Integer)))
 unflatten!{F}(::MLAlgorithm{F}, ::Vector{F}, offset::Integer = 0) = throw(MethodError(unflatten!, (MLAlgorithm{F}, Vector{F}, Integer)))
 
+# some MLAlgorithms should include methods for allocating interal memory space.
+# default action is nothing.
+allocate{T <: MLAlgorithm}(::T) = nothing
+
 # MLAlgorithms should implement evaluate() methods.
 evaluate!{F}(::Vector{F}, ::MLAlgorithm{F}, ::Vector) = throw(MethodError(evaluate, (Vector{F}, MLAlgorithm{F}, Vector)))
 batch_evaluate!{F,N}(::Matrix{F}, ::MLAlgorithm{F}, ::Matrix, ::Type{Val{N}} = Val{0}) = throw(MethodError(batch_evaluate!, (Matrix{F}, MLAlgorithm{F}, Matrix, Type{Val{N}})))
@@ -27,7 +31,7 @@ backpropagate!{F}(::MLAlgorithm{F}, input_values::Vector{F}, output_deltas::Vect
 macro import_interface()
   quote
     #key functions in the interface
-    import ..inputs; import ..outputs; import ..parameters; import ..flatten!; import ..unflatten!
+    import ..inputs; import ..outputs; import ..parameters; import ..flatten!; import ..unflatten!; import allocate
     import ..evaluate!; import ..batch_evaluate!; import ..hasbackpropagation; import ..backpropagate!
     #key type definitions in the interface
     import ..MLAlgorithm; import ..Layer

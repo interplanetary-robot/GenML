@@ -15,10 +15,10 @@ end
 # constructors
 
 #empty constructor - fills the MLP with zero transitions.  Useful for generating empty MLPs
-(::Type{MultilayerPerceptron{F, LD}}){F, LD}() = MultilayerPerceptron{F, LD}(zeros)
+(::Type{MultilayerPerceptron{F, LD}}){F, LD, label}() = MultilayerPerceptron{F, LD}(zeros)
 
 #functions only constructor - fills MLP with zero transitions.
-(::Type{MultilayerPerceptron{F, LD}}){F, LD}(fns::Array{Function, 1}) = MultilayerPerceptron{F, LD}(zeros, fns)
+(::Type{MultilayerPerceptron{F, LD}}){F, LD, label}(fns::Array{Function, 1}) = MultilayerPerceptron{F, LD}(zeros, fns)
 
 # rf - 'randomization function' must have the following property:
 #   rf(F, n) -> 1-d array of random float F
@@ -47,29 +47,8 @@ function (::Type{MultilayerPerceptron{F, LD}}){F, LD}(rf::Function, transfers::A
   MultilayerPerceptron{F, LD}(layers)
 end
 
-#let's also define calling an MLAlgorithm, in cases where you don't need to agressively
-#conserve memory allocations.
-function (mlp::MultilayerPerceptron{F, LD}){F, LD}(input::Vector)
-  #allocate an output vector.
-  output = Vector{F}(LD[end])
-  evaluate!(output, mlp, input)
-  output
-end
-
-function (mlp::MultilayerPerceptron{F, LD}){F, LD}(input::Matrix)
-  #allocate an output matrix.
-  output = Matrix{F}(LD[end], size(input, 2))
-  batch_evaluate!(output, mlp, input)
-  output
-end
-
 include("./serialization.jl")
 include("./evaluation.jl")
 include("./backpropagation.jl")
-
-#optionally, an MLAlgorithm can implement backpropagation.
-#hasbackpropagation{T <: MLAlgorithm}(::Type{T}) = false  #default does not implement backpropagation
-#backpropagate{F}(::MLAlgorithm{F}, training_input::Vector, training_solutions::Vector, costfn::Function, args...) = throw(MethodError(backpropagate, (MLAlgorithm{F}, Vector, Vector, Function)))
-#backpropagate{F}(::MLAlgorithm{F}, training_input::Matrix, training_solutions::Matrix, costfn::Function, args...) = throw(MethodError(backpropagate, (MLAlgorithm{F}, Matrix, Matrix, Function)))
 
 end
