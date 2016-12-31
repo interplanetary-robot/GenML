@@ -12,14 +12,10 @@ function reversematrixfma{F}(input_array::Vector{F}, matrix::Matrix{F}, output_a
   end
 end
 
-@generated function backpropagate!{F, i, o, tf, last}(fcl::FullyConnectedLayer{F, i, o, tf}, input_values::Vector, output_values::Vector{F}, output_deltas::Vector{F}, ::Type{Val{last}})
+@generated function backpropagate!{F, i, o, tf}(fcl::FullyConnectedLayer{F, i, o, tf}, input_values::Vector, output_values::Vector{F}, output_deltas::Vector{F}, ::Type{Val{last}})
   code = quote
     #for now.
     const alpha = F(0.1)
-
-    #println("iv:", input_values)
-    #println("ov:", output_values)
-    #println("od:", output_deltas)
 
     #calculate the delta for BEFORE the transfer function.
     pretransfer_delta = output_deltas .* (dxasy(tf))(output_values)

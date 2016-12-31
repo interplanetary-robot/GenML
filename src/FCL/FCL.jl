@@ -7,15 +7,17 @@ import ..@import_interface
 
 import ..TF.sigmoid
 
-type FullyConnectedLayer{F, inputlength, outputlength, transferfunction} <: Layer{F}
+immutable FullyConnectedLayer{F, inputlength, outputlength, transferfunction} <: Layer{F}
   bias::Vector{F}
   transition::Matrix{F}
 end
 
+(fcl::FullyConnectedLayer{F,i,o,tf}){F,i,o,tf}(v::Array) = ml_call(fcl, v)
+
 function (::Type{FullyConnectedLayer{F,i,o,tf}}){F,i,o,tf}(randomizationfunction::Function = zeros)
   biasvector = randomizationfunction(F, o)
   transitionmatrix = randomizationfunction(F, o, i)
-  FullyConnectedLayer{F,i,o,tf,l}(biasvector, transitionmatrix)
+  FullyConnectedLayer{F,i,o,tf}(biasvector, transitionmatrix)
 end
 
 #implementation of the interfaces

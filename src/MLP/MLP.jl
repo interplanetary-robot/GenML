@@ -7,18 +7,20 @@ import ..@import_interface
 @import_interface
 
 #a canned simple multilayer perceptron type
-type MultilayerPerceptron{F, LayerDescriptor} <: MLAlgorithm{F}
+immutable MultilayerPerceptron{F, LayerDescriptor} <: MLAlgorithm{F}
   layers::Array{FullyConnectedLayer{F},1}
 end
+
+(mlp::MultilayerPerceptron{F, LD}){F,LD}(v::Array) = ml_call(mlp, v)
 
 ################################################################################
 # constructors
 
 #empty constructor - fills the MLP with zero transitions.  Useful for generating empty MLPs
-(::Type{MultilayerPerceptron{F, LD}}){F, LD, label}() = MultilayerPerceptron{F, LD}(zeros)
+(::Type{MultilayerPerceptron{F, LD}}){F, LD}() = MultilayerPerceptron{F, LD}(zeros)
 
 #functions only constructor - fills MLP with zero transitions.
-(::Type{MultilayerPerceptron{F, LD}}){F, LD, label}(fns::Array{Function, 1}) = MultilayerPerceptron{F, LD}(zeros, fns)
+(::Type{MultilayerPerceptron{F, LD}}){F, LD}(fns::Array{Function, 1}) = MultilayerPerceptron{F, LD}(zeros, fns)
 
 # rf - 'randomization function' must have the following property:
 #   rf(F, n) -> 1-d array of random float F
@@ -47,6 +49,7 @@ function (::Type{MultilayerPerceptron{F, LD}}){F, LD}(rf::Function, transfers::A
   MultilayerPerceptron{F, LD}(layers)
 end
 
+include("./storage.jl")
 include("./serialization.jl")
 include("./evaluation.jl")
 include("./backpropagation.jl")

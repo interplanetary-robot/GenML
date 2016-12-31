@@ -32,10 +32,10 @@
 xornet = GenML.MLP.MultilayerPerceptron{Float64, (2,2,1)}()
 
 #hand-written transition matrices.
-xornet.layers[1].bias = [-7.5, 7.5]
-xornet.layers[1].transition = [5.0 5.0; -10.0 -10.0]
-xornet.layers[2].bias = [5.0]
-xornet.layers[2].transition = [-10.0 -10.0]
+xornet.layers[1].bias[:] = [-7.5, 7.5]
+xornet.layers[1].transition[:] = [5.0 5.0; -10.0 -10.0]
+xornet.layers[2].bias[:] = [5.0]
+xornet.layers[2].transition[:] = [-10.0 -10.0]
 
 @test xornet([true, true])[1] < 0.5
 @test xornet([true, false])[1] > 0.5
@@ -46,5 +46,5 @@ xornet.layers[2].transition = [-10.0 -10.0]
 dataset = rand(Bool, 2, 500)
 results = Array{Float64}(1, 500)
 
-GenML.batch_evaluate!(results, xornet, dataset, Val{500})
-@time GenML.batch_evaluate!(results, xornet, dataset, Val{500})
+GenML.evaluate!(results, xornet, dataset)
+@time GenML.evaluate!(results, xornet, dataset)
