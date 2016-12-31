@@ -5,5 +5,6 @@ module Optimizers
 
   include("gradientdescent.jl")
   include("particleswarm.jl")
+  include("backpropagation.jl")
 
 end

@@ -20,7 +20,7 @@ function xortrain_4()
     input_column = input_matrix[:, idx]
     training_column = training_results[:, idx]
 
-    GenML.MLP.backpropagationoptimize(xornet, input_column, training_column, GenML.CF.crossentropy)
+    GenML.Optimizers.backpropagationoptimize(xornet, input_column, training_column, GenML.CF.crossentropy)
   end
   end
 

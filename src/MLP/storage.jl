@@ -58,6 +58,7 @@ doc"""
   #layer 1 is NOT allowed, since that should generically be the "input"
   #layer.
   (L < 2) && throw(ArgumentError("no storage for layers lower than 2"))
+  n = (N == :v) ? 1 : N
   if (L == 2)
     start = 1
     finish = LD[2] * n

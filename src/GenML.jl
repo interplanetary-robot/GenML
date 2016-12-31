@@ -6,17 +6,22 @@ abstract Layer{F} <: MLAlgorithm{F} #a generalized "layer" type
 # interface definition for MLAlgorithm.
 
 # basics.  input and output vector size count.
-inputs{T <: MLAlgorithm}(::Type{T})     = throw(MethodError(inputs, (Type{T},)))
-outputs{T <: MLAlgorithm}(::Type{T})    = throw(MethodError(outputs, (Type{T},)))
-parameters{T <: MLAlgorithm}(::Type{T}) = throw(MethodError(parameters, (Type{T},)))
+inputs{T <: MLAlgorithm}(::Type{T})     = throw(ArgumentError("inputs for $T not properly implemented"))
+outputs{T <: MLAlgorithm}(::Type{T})    = throw(ArgumentError("outputs for $T not properly implemented"))
+parameters{T <: MLAlgorithm}(::Type{T}) = throw(ArgumentError("parameters for $T not properly implemented"))
 
 inputs{T <: MLAlgorithm}(::T)     = inputs(T)
 outputs{T <: MLAlgorithm}(::T)    = outputs(T)
 parameters{T <: MLAlgorithm}(::T) = parameters(T)
 
-
-flatten!{F}(::Vector{F}, ::MLAlgorithm{F}, offset::Integer = 0) = throw(MethodError(flatten!, (Vector{F}, MLAlgorithm{F}, Integer)))
-unflatten!{F}(::MLAlgorithm{F}, ::Vector{F}, offset::Integer = 0) = throw(MethodError(unflatten!, (MLAlgorithm{F}, Vector{F}, Integer)))
+@generated function flatten!{F}(::Vector{F}, mla::MLAlgorithm{F}, offset::Integer = 0)
+  T = mla
+  :(throw(ArgumentError("flatten! for $T not propertly implemented")))
+end
+@generated function unflatten!{F}(mla::MLAlgorithm{F}, ::Vector{F}, offset::Integer = 0)
+  T = mla
+  :(throw(ArgumentError("unflatten! for $T not propertly implemented")))
+end
 
 ################################################################################
 ## nonparametric data storage.
@@ -41,6 +46,12 @@ doc"""
   backwards propagation.
 """
 abstract BackpropStorage{T, N} <: Storage{T, N}
+
+#storage and backpropstorage for layer types is generally not allowed.
+(::Type{Storage}){T <: Layer}(::Type{T})         = throw(ArgumentError("storage of layer types not allowed"))
+(::Type{Storage}){T <: Layer}(::T)               = throw(ArgumentError("storage of layer types not allowed"))
+(::Type{BackpropStorage}){T <: Layer}(::Type{T}) = throw(ArgumentError("storage of layer types not allowed"))
+(::Type{BackpropStorage}){T <: Layer}(::T)       = throw(ArgumentError("storage of layer types not allowed"))
 
 ################################################################################
 ## evaluation
@@ -97,7 +108,31 @@ end
 
 #optionally, an MLAlgorithm can implement backpropagation.
 hasbackpropagation{T <: MLAlgorithm}(::Type{T}) = false  #default does not implement backpropagation
-backpropagate!{F}(::MLAlgorithm{F}, input_values::Vector{F}, output_deltas::Vector{F}) = throw(MethodError(backpropagate, (MLAlgorithm{F}, Vector, Vector)))
+
+#to give backpropagation algorithms the option of not returning the next deltas for the last layer.
+typealias VoidableDeltas{F} Union{AbstractArray{F}, Void}
+
+#compound ml algorithms with backpropagation should implement this function.
+@generated function backpropagate!{F}(mla::MLAlgorithm{F},                   #algorithm to be backpropagated.
+                                      inp::AbstractArray,                    #input values to be trained
+                                      oup::AbstractArray{F},                 #expected output values for training
+                                      ouδ::AbstractArray{F},                 #deltas for these output values
+                                      sto::BackpropStorage,                  #backprop storage data.
+                                                                             #input deltas for passing to the next layer.
+                                      inδ::VoidableDeltas{F} = nothing)
+  T = mla
+  :(throw(ArgumentError("backpropagate! for $T not properly implemented.")))
+end
+
+#layers should implement backpropagation without storage function.
+function backpropagate!{F}(mla::Layer{F},
+                           inp::AbstractArray,
+                           oup::AbstractArray{F},
+                           ouδ::AbstractArray{F},
+                           inδ::VoidableDeltas{F} = nothing)
+  T = mla
+  :(throw(ArgumentError("backpropagate! for $T not properly implemented.")))
+end
 
 
 macro import_interface()
@@ -106,7 +141,8 @@ macro import_interface()
     import ..inputs; import ..outputs; import ..parameters; import ..flatten!; import ..unflatten!
     import ..evaluate!; import ..hasbackpropagation; import ..backpropagate!
     #key type definitions in the interface
-    import ..MLAlgorithm; import ..Layer; import ..Storage; import ..BackpropStorage
+    import ..MLAlgorithm; import ..Layer; import ..VoidableDeltas
+    import ..Storage; import ..BackpropStorage
     #calling convenience function
     import ..ml_call
     #possibly useful modules.

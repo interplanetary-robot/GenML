@@ -2,7 +2,6 @@
 import ..flatten!
 import ..unflatten!
 
-
 function swarmoptimize{F}(mlmodel::MLAlgorithm{F}, input::Matrix, answers::Matrix, cost::Function)
 
   #return this as the stepping function.
