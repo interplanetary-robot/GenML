@@ -14,7 +14,7 @@
     end
   else
     quote
-      warn("memory optimized version of backpropagation has not been implemented yet")
+      #warn("memory optimized version of backpropagation has not been implemented yet")
 
       #generate a storage unit for the mlmodel
       storage = BackpropStorage(mlmodel)

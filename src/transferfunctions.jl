@@ -41,4 +41,6 @@ d(::typeof(id)) = one
 d(::typeof(softplus)) = sigmoid
 d(::typeof(softmax)) = dsoftmax
 
+nounroll(::typeof(softmax)) = true
+
 end
