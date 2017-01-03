@@ -179,7 +179,7 @@ doc"""
   input is a vector.  If the final parameters are omitted, they will be
   autocalculated by measuring the size of the target vector.
 """
-function scaledsubtract{F, vsize, bsize}(target_vector::AbstractVector{F}, value_vector::AbstractVector{F}, alpha::F,
+@generated function scaledsubtract{F, vsize, bsize}(target_vector::AbstractVector{F}, value_vector::AbstractVector{F}, alpha::F,
                                          ::Type{Val{vsize}} = Val{:auto}, ::Type{Val{bsize}} = Val{:auto})
   #create initialization code.
   initcode = :()
@@ -191,7 +191,7 @@ function scaledsubtract{F, vsize, bsize}(target_vector::AbstractVector{F}, value
     end
   end
 end
-function scaledsubtract{F, vsize, bsize}(target_vector::AbstractMatrix{F}, value_vector::AbstractMatrix{F}, alpha::F,
+@generated function scaledsubtract{F, vsize, bsize}(target_vector::AbstractMatrix{F}, value_vector::AbstractMatrix{F}, alpha::F,
                                          ::Type{Val{vsize}} = Val{:auto}, ::Type{Val{bsize}} = Val{:auto})
   #create initialization code.
   initcode = :()

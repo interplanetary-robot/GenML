@@ -27,11 +27,7 @@ hasbackpropagation{F, i, o, tf}(::Type{FullyConnectedLayer{F, i, o, tf}}) = true
 
     scaledsubtract(fcl.bias, output_deltas, alpha, Val{o})
 
-    println("fcl.bias new: $(fcl.bias)")
-
     scaledouterproductfms(fcl.transition, output_deltas, input, alpha, Val{o}, Val{i})
-
-    println("fcl.transition new: $(fcl.transition)")
   end
 
   (input_deltas == Void) && return code
@@ -40,7 +36,5 @@ hasbackpropagation{F, i, o, tf}(::Type{FullyConnectedLayer{F, i, o, tf}}) = true
   quote
     $code
     reversematrixmul(input_deltas, fcl.transition, output_deltas, Val{i}, Val{o})
-
-    println("input_deltas: $input_deltas")
   end
 end
