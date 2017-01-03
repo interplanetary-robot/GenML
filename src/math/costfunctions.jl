@@ -1,6 +1,6 @@
 module CF
 
-import ..d
+import ..Math.d
 
 #cross entropy cost function
 

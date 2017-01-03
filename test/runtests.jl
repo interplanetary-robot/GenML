@@ -1,6 +1,8 @@
 using GenML
 using Base.Test
 
+srand(10)
+
 include("xortest.jl")
 
 #include("xortraintest-1.jl") #noisy xor training test

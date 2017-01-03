@@ -1,3 +1,4 @@
+import ..Math.d
 
 @generated function backpropagationoptimize{F}(mlmodel::MLAlgorithm{F}, input::AbstractArray, answers::AbstractArray, cost::Function)
 

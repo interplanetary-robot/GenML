@@ -1,4 +1,3 @@
-module Math
 
 doc"""
   `GenML.Math.matrixfma(v_out, M::Matrix, v_bias, v_in [Val{outsize}, Val{insize}, Val{bsize}])`
@@ -20,8 +19,8 @@ doc"""
                                         ::Type{Val{osize}} = Val{:auto}, ::Type{Val{isize}} = Val{:auto}, ::Type{Val{bsize}} = Val{:auto})
   #create initialization code.
   initcode = :()
-  (osize == :auto) && initcode = :(osize = size(mtx, 1))
-  (isize == :auto) && initcode = :($initcode; isize = size(mtx, 2))
+  (osize == :auto) && (initcode = :(osize = size(mtx, 1)))
+  (isize == :auto) && (initcode = :($initcode; isize = size(mtx, 2)))
   #batch size is ignored for the vector situation.
   quote
     $initcode
@@ -33,18 +32,18 @@ doc"""
     end
   end
 end
-@generated function matrixfma{F, osize, isize, bsize}(m_out::AbstractMatrix{F}, mtx::AbstractMatrix{F}, m_in::AbstractMatrix{F}, bias::AbstractVector{F},
+@generated function matrixfma{F, osize, isize, bsize}(m_out::AbstractMatrix{F}, mtx::AbstractMatrix{F}, m_in::AbstractMatrix, bias::AbstractVector{F},
                                         ::Type{Val{osize}} = Val{:auto}, ::Type{Val{isize}} = Val{:auto}, ::Type{Val{bsize}} = Val{:auto})
   #create initialization code.
   initcode = :()
-  (osize == :auto) && initcode = :(osize = size(mtx, 1))
-  (isize == :auto) && initcode = :($initcode; isize = size(mtx, 2))
-  (bsize == :auto) && initcode = :($initcode; bsize = size(m_in, 2))
+  (osize == :auto) && (initcode = :(osize = size(mtx, 1)))
+  (isize == :auto) && (initcode = :($initcode; isize = size(mtx, 2)))
+  (bsize == :auto) && (initcode = :($initcode; bsize = size(m_in, 2)))
   quote
     $initcode
     for bdx = 1:bsize
       for idx = 1:osize
-        @inbounds output[idx, bdx] = bias[idx]
+        @inbounds m_out[idx, bdx] = bias[idx]
         @inbounds for jdx = 1:isize
           m_out[idx, bdx] += mtx[idx, jdx] * m_in[jdx, bdx]
         end
@@ -76,8 +75,8 @@ doc"""
                                                   ::Type{Val{isize}} = Val{:auto}, ::Type{Val{osize}} = Val{:auto}, ::Type{Val{bsize}} = Val{:auto})
   #create initialization code.
   initcode = :()
-  (osize == :auto) && initcode = :(osize = size(mtx, 1))
-  (isize == :auto) && initcode = :($initcode; isize = size(mtx, 2))
+  (osize == :auto) && (initcode = :(osize = size(mtx, 1)))
+  (isize == :auto) && (initcode = :($initcode; isize = size(mtx, 2)))
   #batch size is ignored for the vector situation.
   quote
     $initcode
@@ -89,13 +88,13 @@ doc"""
     end
   end
 end
-@generated function reversematrixmul{F, isize, osize, bsize}(m_in::AbstractVector{F}, matrix::AbstractMatrix{F}, m_out::AbstractVector{F},
+@generated function reversematrixmul{F, isize, osize, bsize}(m_in::AbstractMatrix{F}, matrix::AbstractMatrix{F}, m_out::AbstractMatrix{F},
                                                   ::Type{Val{isize}} = Val{:auto}, ::Type{Val{osize}} = Val{:auto}, ::Type{Val{bsize}} = Val{:auto})
   #create initialization code.
   initcode = :()
-  (osize == :auto) && initcode = :(osize = size(mtx, 1))
-  (isize == :auto) && initcode = :($initcode; isize = size(mtx, 2))
-  (bsize == :auto) && initcode = :($initcode; bsize = size(m_out, 2))
+  (osize == :auto) && (initcode = :(osize = size(mtx, 1)))
+  (isize == :auto) && (initcode = :($initcode; isize = size(mtx, 2)))
+  (bsize == :auto) && (initcode = :($initcode; bsize = size(m_out, 2)))
   #batch size is ignored for the vector situation.
   quote
     $initcode
@@ -133,8 +132,8 @@ doc"""
                               ::Type{Val{osize}} = Val{:auto}, ::Type{Val{isize}} = Val{:auto}, ::Type{Val{bsize}} = Val{:auto})
   #create initialization code.
   initcode = :()
-  (osize == :auto) && initcode = :(osize = size(mtx, 1))
-  (isize == :auto) && initcode = :($initcode; isize = size(mtx, 2))
+  (osize == :auto) && (initcode = :(osize = size(mtx, 1)))
+  (isize == :auto) && (initcode = :($initcode; isize = size(mtx, 2)))
   #batch size is ignored for the vector situation.
   quote
     $initcode
@@ -149,9 +148,9 @@ end
                               ::Type{Val{osize}} = Val{:auto}, ::Type{Val{isize}} = Val{:auto}, ::Type{Val{bsize}} = Val{:auto})
   #create initialization code.
   initcode = :()
-  (osize == :auto) && initcode = :(osize = size(mtx, 1))
-  (isize == :auto) && initcode = :($initcode; isize = size(mtx, 2))
-  (bsize == :auto) && initcode = :($initcode; bsize = size(d_out, 2))
+  (osize == :auto) && (initcode = :(osize = size(mtx, 1)))
+  (isize == :auto) && (initcode = :($initcode; isize = size(mtx, 2)))
+  (bsize == :auto) && (initcode = :($initcode; bsize = size(d_out, 2)))
   #batch size is ignored for the vector situation.
   quote
     $initcode
@@ -181,10 +180,10 @@ doc"""
   autocalculated by measuring the size of the target vector.
 """
 function scaledsubtract{F, vsize, bsize}(target_vector::AbstractVector{F}, value_vector::AbstractVector{F}, alpha::F,
-                                         ::Type{Val{vsize}} = Val{auto}, ::Type{Val{bsize}} = Val{auto})
+                                         ::Type{Val{vsize}} = Val{:auto}, ::Type{Val{bsize}} = Val{:auto})
   #create initialization code.
   initcode = :()
-  (vsize == :auto) && initcode = :(vsize = length(target_vector))
+  (vsize == :auto) && (initcode = :(vsize = length(target_vector)))
   quote
     $initcode
     for idx = 1:vsize
@@ -193,11 +192,11 @@ function scaledsubtract{F, vsize, bsize}(target_vector::AbstractVector{F}, value
   end
 end
 function scaledsubtract{F, vsize, bsize}(target_vector::AbstractMatrix{F}, value_vector::AbstractMatrix{F}, alpha::F,
-                                         ::Type{Val{vsize}} = Val{auto}, ::Type{Val{bsize}} = Val{auto})
+                                         ::Type{Val{vsize}} = Val{:auto}, ::Type{Val{bsize}} = Val{:auto})
   #create initialization code.
   initcode = :()
-  (vsize == :auto) && initcode = :(vsize = size(target_vector, 1))
-  (bsize == :auto) && initcode = :(initcode; bsize = size(value_vector, 2))
+  (vsize == :auto) && (initcode = :(vsize = size(target_vector, 1)))
+  (bsize == :auto) && (initcode = :(initcode; bsize = size(value_vector, 2)))
   quote
     $initcode
     for idx = 1:vsize
@@ -228,7 +227,7 @@ function dxasychainrule{F, vsize, bsize}(outer_differential::AbstractVector{F}, 
                         ::Type{Val{vsize}} = Val{:auto}, ::Type{Val{bsize}} = Val{:auto})
   #create initialization code.
   initcode = :()
-  (vsize == :auto) && initcode = :(vsize = length(outer_differential))
+  (vsize == :auto) && (initcode = :(vsize = length(outer_differential)))
   if nounroll(dxasy(f))
     quote
       $initcode
@@ -247,8 +246,8 @@ function dxasychainrule{F, vsize, bsize}(outer_differential::AbstractMatrix{F}, 
                         ::Type{Val{vsize}} = Val{:auto}, ::Type{Val{bsize}} = Val{:auto})
   #create initialization code.
   initcode = :()
-  (vsize == :auto) && initcode = :(vsize = size(outer_differential, 1))
-  (bsize == :auto) && initcode = :(initcode; bsize = size(outer_differential, 2))
+  (vsize == :auto) && (initcode = :(vsize = size(outer_differential, 1)))
+  (bsize == :auto) && (initcode = :(initcode; bsize = size(outer_differential, 2)))
   if nounroll(dxasy(f))
     quote
       $initcode
@@ -267,5 +266,3 @@ function dxasychainrule{F, vsize, bsize}(outer_differential::AbstractMatrix{F}, 
     end
   end
 end
-
-end  #modlue

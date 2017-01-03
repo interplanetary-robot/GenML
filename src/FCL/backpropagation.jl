@@ -1,4 +1,10 @@
 
+import ..Math.dxasychainrule
+import ..Math.scaledsubtract
+import ..Math.scaledouterproductfms
+import ..Math.reversematrixmul
+
+
 ################################################################################
 # back propagation.
 hasbackpropagation{F, i, o, tf}(::Type{FullyConnectedLayer{F, i, o, tf}}) = true
@@ -16,12 +22,23 @@ hasbackpropagation{F, i, o, tf}(::Type{FullyConnectedLayer{F, i, o, tf}}) = true
     #for now.
     const alpha = F(0.1)
 
+    println("input $input")
+    println("output $output")
+    println("output deltas $output_deltas")
+    println("input deltas $input_deltas")
+
     #overwrite the output delta values with the adjusted values taking the
-    dxasychainrule(output_deltas, output, tf, o)
+    dxasychainrule(output_deltas, output, tf, Val{o})
 
-    scaledsubtract(fcl.bias, output_deltas, alpha, o)
+    println("output deltas new: $output_deltas")
 
-    scaledouterproductfma(fcl.transition, output_deltas, input, alpha, i, o)
+    scaledsubtract(fcl.bias, output_deltas, alpha, Val{o})
+
+    println("fcl.bias new: $(fcl.bias)")
+
+    scaledouterproductfms(fcl.transition, output_deltas, input, alpha, Val{o}, Val{i})
+
+    println("fcl.transition new: $(fcl.transition)")
   end
 
   (input_deltas == Void) && return code
@@ -29,6 +46,10 @@ hasbackpropagation{F, i, o, tf}(::Type{FullyConnectedLayer{F, i, o, tf}}) = true
   #handle the backpropagating delta data.
   quote
     $code
-    reversematrixfma(input_deltas, fcl.transition, output_deltas, i, o)
+    reversematrixmul(input_deltas, fcl.transition, output_deltas, Val{i}, Val{o})
+
+    println("input_deltas: $input_deltas")
+
+    exit()
   end
 end

@@ -57,15 +57,15 @@ abstract BackpropStorage{T, N} <: Storage{T, N}
 ## evaluation
 
 # MLAlgorithms should implement evaluate() methods.
-@generated function evaluate!{F}(::AbstractArray{F}, mla::MLAlgorithm{F}, ::AbstractArray, ::Storage)
+@generated function evaluate!{F, bsize}(::AbstractArray{F}, mla::MLAlgorithm{F}, ::AbstractArray, ::Storage, ::Type{Val{bsize}} = Val{:auto})
   if mla <: Layer
     :(throw(ArgumentError("Layer types don't implement storage evaluation.")))
   else
-    :(throw(MethodError(evaluate!, (AbstractArray{F}, MLAlgorithm{F}, Array, Storage))))
+    :(throw(ArgumentError("evaluate! not yet implemented")))
   end
 end
 
-@generated function evaluate!{F}(output::AbstractArray{F}, mla::MLAlgorithm{F}, input::AbstractArray)
+@generated function evaluate!{F, bsize}(output::AbstractArray{F}, mla::MLAlgorithm{F}, input::AbstractArray, ::Type{Val{bsize}} = Val{:auto})
   #for the situation where the memory has not been preallocated, do the following.
   if input <: AbstractVector
     #catch mismatched input/output type parameters at the compile stage.
@@ -74,7 +74,7 @@ end
       #generate the temporary storage
       sbuf = Storage(mla, :v)
       #go!
-      evaluate!(output, mla, input, sbuf)
+      evaluate!(output, mla, input, sbuf, Val{bsize})
     end
   elseif input <: AbstractMatrix
     #catch mismatched input/output type parameters at the compile stage.
@@ -85,7 +85,7 @@ end
       #generate the temporary storage with the correct batch size.
       sbuf = Storage(mla, size(input, 2))
       #go!
-      evaluate!(output, mla, input, sbuf)
+      evaluate!(output, mla, input, sbuf, Val{bsize})
     end
   end
 end
@@ -147,18 +147,11 @@ macro import_interface()
     import ..ml_call
     #possibly useful modules.
     import ..TF; import ..CF
-    #differentiation interface
-    import ..d; import ..dxasy
   end
 end
 
 #mathematical utilities
-#tools for differentiation
-include("./differentiation.jl")
-#transfer functions.
-include("./transferfunctions.jl")
-#include general cost functions
-include("./costfunctions.jl")
+include("./math/math.jl")
 
 #subtypes
 include("./FCL/FCL.jl") #fully connected layer
