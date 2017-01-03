@@ -223,7 +223,7 @@ doc"""
   ignored if the input is a vector.  If the final parameters are omitted,
   they will be autocalculated by measuring the size of the target vector.
 """
-function dxasychainrule{F, vsize, bsize}(outer_differential::AbstractVector{F}, inner_value::AbstractVector{F}, f::Function,
+@generated function dxasychainrule{F, vsize, bsize}(outer_differential::AbstractVector{F}, inner_value::AbstractVector{F}, f::Function,
                         ::Type{Val{vsize}} = Val{:auto}, ::Type{Val{bsize}} = Val{:auto})
   #create initialization code.
   initcode = :()
@@ -242,7 +242,7 @@ function dxasychainrule{F, vsize, bsize}(outer_differential::AbstractVector{F}, 
     end
   end
 end
-function dxasychainrule{F, vsize, bsize}(outer_differential::AbstractMatrix{F}, inner_value::AbstractMatrix{F}, f::Function,
+@generated function dxasychainrule{F, vsize, bsize}(outer_differential::AbstractMatrix{F}, inner_value::AbstractMatrix{F}, f::Function,
                         ::Type{Val{vsize}} = Val{:auto}, ::Type{Val{bsize}} = Val{:auto})
   #create initialization code.
   initcode = :()

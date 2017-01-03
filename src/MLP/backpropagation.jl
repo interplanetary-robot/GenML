@@ -29,4 +29,7 @@ function backpropagate!{F, LD}(mlp::MultilayerPerceptron{F, LD},
 
   #solve the last layer, and if the backpropagation isn't supposed to terminate here, pass on the next array.
   backpropagate!(mlp.layers[1], input, this_layer_output, this_layer_deltas, input_deltas)
+
+  println("mlp:", mlp)
+  exit()
 end

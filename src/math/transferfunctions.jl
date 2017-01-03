@@ -35,6 +35,11 @@ dxasy(::typeof(sigmoid)) = dasysigmoid
 dxasy(::typeof(id)) = one
 dxasy(::typeof(softplus)) = dasysoftplus
 dxasy(::typeof(softmax)) = dasysigmoid
+#necessary to access the dxasy function in generated functions.
+dxasy(::Type{typeof(sigmoid)}) = dasysigmoid
+dxasy(::Type{typeof(id)}) = one
+dxasy(::Type{typeof(softplus)}) = dasysoftplus
+dxasy(::Type{typeof(softmax)}) = dasysigmoid
 
 d(::typeof(sigmoid)) = dsigmoid
 d(::typeof(id)) = one

@@ -22,15 +22,8 @@ hasbackpropagation{F, i, o, tf}(::Type{FullyConnectedLayer{F, i, o, tf}}) = true
     #for now.
     const alpha = F(0.1)
 
-    println("input $input")
-    println("output $output")
-    println("output deltas $output_deltas")
-    println("input deltas $input_deltas")
-
     #overwrite the output delta values with the adjusted values taking the
     dxasychainrule(output_deltas, output, tf, Val{o})
-
-    println("output deltas new: $output_deltas")
 
     scaledsubtract(fcl.bias, output_deltas, alpha, Val{o})
 
@@ -49,7 +42,5 @@ hasbackpropagation{F, i, o, tf}(::Type{FullyConnectedLayer{F, i, o, tf}}) = true
     reversematrixmul(input_deltas, fcl.transition, output_deltas, Val{i}, Val{o})
 
     println("input_deltas: $input_deltas")
-
-    exit()
   end
 end
