@@ -18,7 +18,7 @@ function (::Type{BackpropStorage}){F, LD}(::Type{MultilayerPerceptron{F, LD}}, N
   layercount = sum(LD[2:end-1]) * ((N == :v) ? 1 : N)
   MLPBackpropStorage{F, LD, N}(Vector{F}(layercount), Vector{F}(layercount))
 end
-(::Type{BackpropStorage}){T <: MultilayerPerceptron}(::T, N = :v) = BackpropStorage(T)
+(::Type{BackpropStorage}){T <: MultilayerPerceptron}(::T, N = :v) = BackpropStorage(T, N)
 
 doc"""
   `GenML.MLP.layer(::Storage{MultilayerPerceptron}, Val{N})`
@@ -71,6 +71,6 @@ doc"""
     :(view(s.backprop_buffer, $start:$finish))
   else
     layersize = LD[L]
-    :(reshape(view(s.backprop_buffer, $start:$finish), layersize, N))
+    :(reshape(view(s.backprop_buffer, $start:$finish), $layersize, N))
   end
 end

@@ -196,7 +196,7 @@ end
   #create initialization code.
   initcode = :()
   (vsize == :auto) && (initcode = :(vsize = size(target_vector, 1)))
-  (bsize == :auto) && (initcode = :(initcode; bsize = size(value_vector, 2)))
+  (bsize == :auto) && (initcode = :($initcode; bsize = size(value_vector, 2)))
   quote
     $initcode
     for idx = 1:vsize
@@ -247,7 +247,7 @@ end
   #create initialization code.
   initcode = :()
   (vsize == :auto) && (initcode = :(vsize = size(outer_differential, 1)))
-  (bsize == :auto) && (initcode = :(initcode; bsize = size(outer_differential, 2)))
+  (bsize == :auto) && (initcode = :($initcode; bsize = size(outer_differential, 2)))
   if nounroll(dxasy(f))
     quote
       $initcode

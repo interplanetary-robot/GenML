@@ -33,7 +33,7 @@ function (::Type{MultilayerPerceptron{F, LD}}){F, LD}(rf::Function, transfers::A
   if (!default_constructor)
     (length(transfers) != length(LD) - 1) && throw(ArgumentError("transfer function list must match length of the descriptors"))
     #test to make sure the transfer function successfully executes across arrays.
-    for tf in transfers; testval = tf.(ones(F, 10)); end
+    #for tf in transfers; testval = tf.(ones(F, 10)); end
   end
 
   #create an empty layers object.
@@ -53,5 +53,6 @@ include("./storage.jl")
 include("./serialization.jl")
 include("./evaluation.jl")
 include("./backpropagation.jl")
+include("./dropout.jl")
 
 end

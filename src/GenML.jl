@@ -106,6 +106,9 @@ end
   end
 end
 
+################################################################################
+## backpropagation
+
 #optionally, an MLAlgorithm can implement backpropagation.
 hasbackpropagation{T <: MLAlgorithm}(::Type{T}) = false  #default does not implement backpropagation
 
@@ -134,6 +137,29 @@ function backpropagate!{F}(mla::Layer{F},
   :(throw(ArgumentError("backpropagate! for $T not properly implemented.")))
 end
 
+################################################################################
+## dropouts
+
+abstract DropoutStorage{T <: MLAlgorithm}
+
+#optionally an MLAlgorithm can implement dropouts
+hasdropout{T <: MLAlgorithm}(::Type{T}) = false #which we set to as a default
+
+generate_dropout_storage{T <: MLAlgorithm}(::T) = throw(ArgumentError("dropout not defined for type $T"))
+
+doc"""
+  GenML.dropout!(::MLAlgorithm, ::DropoutStorage)
+
+  performs a dropout on the ML algorithm.  Values are stored in dropoutstorage for later reintegration using GenML.restore!
+"""
+dropout!{T <: MLAlgorithm}(mla::T, sto::DropoutStorage{T}) = throw(ArgumentError("dropout! not defined for type $T"))
+
+doc"""
+  GenML.restore!(::MLAlgorithm, ::DropoutStorage)
+
+  restores lost values from a dropout! process.
+"""
+restore!{T <: MLAlgorithm}(mla::T, sto::DropoutStorage{T}) = throw(ArgumentError("restore! not defined for type $T"))
 
 macro import_interface()
   quote
@@ -142,7 +168,10 @@ macro import_interface()
     import ..evaluate!; import ..hasbackpropagation; import ..backpropagate!
     #key type definitions in the interface
     import ..MLAlgorithm; import ..Layer; import ..VoidableDeltas
-    import ..Storage; import ..BackpropStorage
+    import ..Storage; import ..BackpropStorage; import ..DropoutStorage
+    #dropout stuff
+    import ..hasdropout; import ..generate_dropout_storage;
+    import ..dropout!; import ..restore!
     #calling convenience function
     import ..ml_call
     #possibly useful modules.

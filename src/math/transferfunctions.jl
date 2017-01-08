@@ -1,6 +1,7 @@
 module TF
 
 import ..Math.d; import ..Math.dxasy
+import ..Math.nounroll
 
 sigmoid{F <: AbstractFloat}(x::F) = one(F)/(one(F) + exp(-x))
 dasysigmoid{F <: AbstractFloat}(y::F) = y * (one(F) - y)

@@ -28,5 +28,6 @@ parameters{F, i, o, tf}(::Type{FullyConnectedLayer{F, i, o, tf}})  = (i + 1) * o
 include("./serialization.jl")
 include("./evaluation.jl")
 include("./backpropagation.jl")
+include("./dropout.jl")
 
 end #module

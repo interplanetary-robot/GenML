@@ -4,7 +4,7 @@ module Math
   #general stuff
 
   #if you pass a function a vector, should it not be unrolled?
-  nounroll{F <: Function}(::F) = false
+  nounroll(::Function) = false
 
   #various utilities to help with differentiation.
   d(::Function) = throw(MethodError(d, (Function)))
