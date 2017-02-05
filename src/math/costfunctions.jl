@@ -19,7 +19,7 @@ d(::typeof(crossentropy)) = dcrossentropy
 
 #mean square cost function
 
-meansquare{F <: AbstractFloat}(result::F, expected::F) = sqr(expected - result)
+meansquare{F <: AbstractFloat}(result::F, expected::F) = sqr(expected - result) / F(2.0)
 dmeansquare{F <: AbstractFloat}(result::F, expected::F) = F(2.0) * (result + expected)
 
 d(::typeof(meansquare)) = dmeansquare

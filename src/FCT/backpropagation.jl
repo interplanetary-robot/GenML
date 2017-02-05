@@ -7,12 +7,12 @@ import ..Math.reversematrixmul
 
 ################################################################################
 # back propagation.
-hasbackpropagation{F, i, o, tf}(::Type{FullyConnectedLayer{F, i, o, tf}}) = true
+hasbackpropagation{F, i, o, tf}(::Type{FullyConnectedTransition{F, i, o, tf}}) = true
 
 #TODO - make all of the i/o value parameters to force recompilation for each
 #value.
 
-@generated function backpropagate!{F, i, o, tf}(fcl::FullyConnectedLayer{F, i, o, tf},
+@generated function backpropagate!{F, i, o, tf}(fcl::FullyConnectedTransition{F, i, o, tf},
 #==#                                            input::AbstractArray,
 #==#                                            output::AbstractArray{F},
 #==#                                            output_deltas::AbstractArray{F},

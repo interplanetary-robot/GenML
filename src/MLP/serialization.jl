@@ -8,7 +8,7 @@ outputs{F, LD}(::Type{MultilayerPerceptron{F, LD}}) = last(LD)
   totalparams = 0
   for idx = 1:(length(LD) - 1)
     #just use a dummy function here, since it doesn't affect the parameter count.
-    totalparams += parameters(FullyConnectedLayer{F, LD[idx], LD[idx + 1], TF.sigmoid})
+    totalparams += parameters(FullyConnectedTransition{F, LD[idx], LD[idx + 1], TF.sigmoid})
   end
   :($totalparams)
 end
@@ -24,7 +24,7 @@ end
       $code
       flatten!(v, mlp.layers[$idx], $current_offset)
     end
-    current_offset += parameters(FullyConnectedLayer{F, LD[idx], LD[idx + 1], TF.sigmoid})
+    current_offset += parameters(FullyConnectedTransition{F, LD[idx], LD[idx + 1], TF.sigmoid})
   end
   code
 end
@@ -40,7 +40,7 @@ end
       $code
       unflatten!(mlp.layers[$idx], storage, $current_offset)
     end
-    current_offset += parameters(FullyConnectedLayer{F, LD[idx], LD[idx + 1], TF.sigmoid})
+    current_offset += parameters(FullyConnectedTransition{F, LD[idx], LD[idx + 1], TF.sigmoid})
   end
   code
 end

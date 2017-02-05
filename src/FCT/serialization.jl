@@ -1,5 +1,5 @@
 #the calling function is responsible for allocating the proper number of array slots to do this correctly.
-function flatten!{F, i, o, tf}(v::Vector{F}, fcl::FullyConnectedLayer{F, i, o, tf}, offset::Integer = 0)
+function flatten!{F, i, o, tf}(v::Vector{F}, fcl::FullyConnectedTransition{F, i, o, tf}, offset::Integer = 0)
 
   #first slot in the biases.
   @inbounds for idx = 1:o
@@ -12,7 +12,7 @@ function flatten!{F, i, o, tf}(v::Vector{F}, fcl::FullyConnectedLayer{F, i, o, t
   end
 end
 
-function unflatten!{F, i, o, tf}(fcl::FullyConnectedLayer{F, i, o, tf}, v::Vector{F}, offset::Integer = 0)
+function unflatten!{F, i, o, tf}(fcl::FullyConnectedTransition{F, i, o, tf}, v::Vector{F}, offset::Integer = 0)
   #reverse the process
   @inbounds for idx = 1:o
     fcl.bias[idx] = v[idx + offset]

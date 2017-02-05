@@ -2,7 +2,7 @@ import GenML.Math.matrixfma
 import GenML.Math.nounroll
 
 @generated function evaluate!{F, i, o, tf, bsize}(output::AbstractVector{F},
-  fcl::FullyConnectedLayer{F, i, o, tf}, input::AbstractVector, ::Type{Val{bsize}} = Val{:auto})
+  fcl::FullyConnectedTransition{F, i, o, tf}, input::AbstractVector, ::Type{Val{bsize}} = Val{:auto})
 
   (bsize != :v) && (bsize != :auto) && return :(throw(ArgumentError("vector evaluation can't do a numerical bsize.")))
 
@@ -24,7 +24,7 @@ import GenML.Math.nounroll
 end
 
 @generated function evaluate!{F, i, o, tf, bsize}(output::AbstractMatrix{F},
-  fcl::FullyConnectedLayer{F, i, o, tf}, input::AbstractMatrix, ::Type{Val{bsize}} = Val{:auto})
+  fcl::FullyConnectedTransition{F, i, o, tf}, input::AbstractMatrix, ::Type{Val{bsize}} = Val{:auto})
 
   (bsize != :v) && (bsize != :auto) && return :(throw(ArgumentError("vector evaluation can't do a numerical bsize.")))
 

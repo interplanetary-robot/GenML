@@ -1,6 +1,6 @@
 module MLP
 
-import ..FCL.FullyConnectedLayer
+import ..FCT.FullyConnectedTransition
 import ..TF.sigmoid
 
 import ..@import_interface
@@ -8,7 +8,7 @@ import ..@import_interface
 
 #a canned simple multilayer perceptron type
 immutable MultilayerPerceptron{F, LayerDescriptor} <: MLAlgorithm{F}
-  layers::Array{FullyConnectedLayer{F},1}
+  layers::Array{FullyConnectedTransition{F},1}
 end
 
 (mlp::MultilayerPerceptron{F, LD}){F,LD}(v::Array) = ml_call(mlp, v)
@@ -37,12 +37,12 @@ function (::Type{MultilayerPerceptron{F, LD}}){F, LD}(rf::Function, transfers::A
   end
 
   #create an empty layers object.
-  layers = FullyConnectedLayer{F}[]
+  layers = FullyConnectedTransition{F}[]
   for idx = 1:(length(LD) - 1)
     if default_constructor
-      push!(layers, FullyConnectedLayer{F, LD[idx], LD[idx + 1], sigmoid}(rf))
+      push!(layers, FullyConnectedTransition{F, LD[idx], LD[idx + 1], sigmoid}(rf))
     else
-      push!(layers, FullyConnectedLayer{F, LD[idx], LD[idx + 1], transfers[idx]}(rf))
+      push!(layers, FullyConnectedTransition{F, LD[idx], LD[idx + 1], transfers[idx]}(rf))
     end
   end
 

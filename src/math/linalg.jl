@@ -191,7 +191,7 @@ doc"""
     end
   end
 end
-@generated function scaledsubtract{F, vsize, bsize}(target_vector::AbstractMatrix{F}, value_vector::AbstractMatrix{F}, alpha::F,
+@generated function scaledsubtract{F, vsize, bsize}(target_vector::AbstractVector{F}, value_vector::AbstractMatrix{F}, alpha::F,
                                          ::Type{Val{vsize}} = Val{:auto}, ::Type{Val{bsize}} = Val{:auto})
   #create initialization code.
   initcode = :()

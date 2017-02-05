@@ -1,6 +1,8 @@
 using MNIST
 using GenML
 
+srand(10)
+
 #naive MNIST FCLNN demo, inspired by
 # https://github.com/jostmey/DeepNeuralClassifier
 
@@ -12,9 +14,11 @@ labels = map(Int64, data[2])
 
 #next, create the neural net.
 
+scaled_rand(p...) = 0.1*randn(p...)
+
 import GenML.TF: sigmoid, softplus, softmax
 
-MNISTNET = GenML.MLP.MultilayerPerceptron{Float32, (784, 250, 100, 50, 10)}(randn, [sigmoid, softplus, softplus, softmax])
+MNISTNET = GenML.MLP.MultilayerPerceptron{Float32, (784, 500, 500, 500, 10)}(scaled_rand, [sigmoid, softplus, softplus, softmax])
 dropoutstorage = GenML.generate_dropout_storage(MNISTNET)
 
 const N_minibatch = 100
@@ -44,11 +48,23 @@ for i = 1:N_updates
   #actually do the forward propagation.
 
   GenML.evaluate!(minibatch_hypotheses, MNISTNET, minibatch_datastore, minibatch_storage)
-  res_deltas = (dcostfunction(minibatch_resultstore, minibatch_hypotheses))
-  GenML.backpropagate!(MNISTNET, minibatch_datastore, minibatch_hypotheses, res_deltas, minibatch_storage)
 
-  exit()
+  res_deltas = (dcostfunction(minibatch_resultstore, minibatch_hypotheses))
+
+  GenML.backpropagate!(MNISTNET, minibatch_datastore, minibatch_hypotheses, res_deltas, minibatch_storage)
 
   #restore the dropouts.
   GenML.restore!(MNISTNET, dropoutstorage)
+
+  #test the network.
+  GenML.evaluate!(minibatch_hypotheses, MNISTNET, minibatch_datastore, minibatch_storage)
+
+  totals = 0
+  for idx = 1:N_minibatch
+    #check to see if the hypothesis matches the value.
+    hyp_ind = indmax(minibatch_hypotheses[:, idx])
+    #println("minibatch result:", minibatch_hypotheses[:, idx])
+    totals += minibatch_resultstore[hyp_ind]
+  end
+  println("$totals % correct on batch $i")
 end

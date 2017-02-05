@@ -17,3 +17,9 @@ end #module math
 
 include("costfunctions.jl")
 include("transferfunctions.jl")
+
+function Base.convert{F <: AbstractFloat}(::Type{Bool}, pval::F)
+  (pval < zero(F)) && throw(InexactError())
+  (pval > one(F)) && throw(InexactError())
+  return pval > F(0.5)
+end

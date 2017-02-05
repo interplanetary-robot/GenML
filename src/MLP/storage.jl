@@ -1,8 +1,11 @@
-immutable MLPStorage{F, LayerDescriptor, N} <: Storage{MultilayerPerceptron{F, LayerDescriptor}, N}
+#overload nolayers.
+nolayers{F, LD}(::Type{MultilayerPerceptron{F,LD}}) = false
+
+immutable MLP_Storage{F, LayerDescriptor, N} <: Storage{MultilayerPerceptron{F, LayerDescriptor}, N}
   layer_buffer::Vector{F}
 end
 
-immutable MLPBackpropStorage{F, LayerDescriptor, N} <: BackpropStorage{MultilayerPerceptron{F, LayerDescriptor}, N}
+immutable MLP_BackpropStorage{F, LayerDescriptor, N} <: BackpropStorage{MultilayerPerceptron{F, LayerDescriptor}, N}
   layer_buffer::Vector{F}
   backprop_buffer::Vector{F}
 end
@@ -10,13 +13,13 @@ end
 #implement allocations that allow creation of the default nonparametric allocations.
 function (::Type{Storage}){F, LD}(::Type{MultilayerPerceptron{F, LD}}, N = :v)
   layercount = sum(LD[2:end-1]) * ((N == :v) ? 1 : N)
-  MLPStorage{F, LD, N}(Vector{F}(layercount))
+  MLP_Storage{F, LD, N}(Vector{F}(layercount))
 end
 (::Type{Storage}){T <: MultilayerPerceptron}(::T, N = :v) = Storage(T, N)
 
 function (::Type{BackpropStorage}){F, LD}(::Type{MultilayerPerceptron{F, LD}}, N = :v)
   layercount = sum(LD[2:end-1]) * ((N == :v) ? 1 : N)
-  MLPBackpropStorage{F, LD, N}(Vector{F}(layercount), Vector{F}(layercount))
+  MLP_BackpropStorage{F, LD, N}(Vector{F}(layercount), Vector{F}(layercount))
 end
 (::Type{BackpropStorage}){T <: MultilayerPerceptron}(::T, N = :v) = BackpropStorage(T, N)
 
@@ -49,11 +52,11 @@ doc"""
 end
 
 doc"""
-  `GenML.MLP.layer(::Storage{MultilayerPerceptron}, Val{N})`
+  `GenML.MLP.backprop_layer(::Storage{MultilayerPerceptron}, Val{N})`
 
   finds a reference to backpropagation data in the execution storage for an MLP
 """
-@generated function backprop_layer{F, LD, N, L}(s::MLPBackpropStorage{F, LD, N}, ::Type{Val{L}})
+@generated function backprop_layer{F, LD, N, L}(s::MLP_BackpropStorage{F, LD, N}, ::Type{Val{L}})
   #retrieves the view on the array which represents layer n.  Note:
   #layer 1 is NOT allowed, since that should generically be the "input"
   #layer.

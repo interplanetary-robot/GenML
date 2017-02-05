@@ -1,7 +1,6 @@
 module GenML
 
 abstract MLAlgorithm{F} #general type for any machine learning algorithm.
-abstract Layer{F} <: MLAlgorithm{F} #a generalized "layer" type
 
 # interface definition for MLAlgorithm.
 
@@ -27,31 +26,39 @@ end
 ## nonparametric data storage.
 
 doc"""
-  `GenML.Storage(::Type{MLAlgorithm}, N = :v)`
-  `GenML.Storage(::MLAlgorithm, N = :v)`
+  `GenML.Storage(::Type{MLAlgorithm}, B = :v)`
+  `GenML.Storage(::MLAlgorithm, B = :v)`
 
   takes an ML algorithm and allocates all non-parametric memory required to
-  evaluate the algorithm.
+  evaluate the algorithm.  N describes the proposed batch size that storage
+  will be able to accomodate.  You may pass this the :v symbol which means
+  the MLAlgorithm will be called with a vector, note this is distinct from
+  a 1-column matrix.
 """
-abstract Storage{T <: MLAlgorithm, N}
+abstract Storage{T <: MLAlgorithm, B}
 
 doc"""
-  `GenML.BackpropStorage(::Type{MLAlgorithm})`
-  `GenML.BackpropStorage(::MLAlgorithm)`
+  `GenML.BackpropStorage(::Type{MLAlgorithm}, B = :v)`
+  `GenML.BackpropStorage(::MLAlgorithm. B = :v)`
 
   takes an ML algorithm and allocates all non-parametric memory required to
   evaluate AND backpropagate the algorithm.  Implementations of backprop storage
   should be written in such a way that it be passed as a parameter to the
   forward evaluation which will persistently populate the layer data for the
-  backwards propagation.
+  backwards propagation.  B describes the batch size that the backpropstorage
+  will be able to accomodate.  You may pass this the :v symbol which means
+  the MLAlgorithm will be called with a vector, note this is distinct from
+  a 1-column matrix.
 """
-abstract BackpropStorage{T, N} <: Storage{T, N}
+abstract BackpropStorage{T, B} <: Storage{T, B}
 
-#storage and backpropstorage for layer types is generally not allowed.
-(::Type{Storage}){T <: Layer}(::Type{T})         = throw(ArgumentError("storage of layer types not allowed"))
-(::Type{Storage}){T <: Layer}(::T)               = throw(ArgumentError("storage of layer types not allowed"))
-(::Type{BackpropStorage}){T <: Layer}(::Type{T}) = throw(ArgumentError("storage of layer types not allowed"))
-(::Type{BackpropStorage}){T <: Layer}(::T)       = throw(ArgumentError("storage of layer types not allowed"))
+#set default Storage and BackpropStorage constructors to warn that they aren't implemented yet.
+(::Type{Storage}){T <: MLAlgorithm}(::Type{T}, batchsize) = throw(ArgumentError("Storage not implemented for $T"))
+(::Type{BackpropStorage}){T <: MLAlgorithm}(::Type{T}, batchsize) = throw(ArgumentError("BackpropStorage not implemented for $T"))
+
+#the nostorage refers to the fact that a particular MLAlgorithm is a "single transition"
+#which contains no layers.  Defaults to true.
+nolayers{T <: MLAlgorithm}(::Type{T}) = true
 
 ################################################################################
 ## evaluation
@@ -127,8 +134,8 @@ typealias VoidableDeltas{F} Union{AbstractArray{F}, Void}
   :(throw(ArgumentError("backpropagate! for $T not properly implemented.")))
 end
 
-#layers should implement backpropagation without storage function.
-function backpropagate!{F}(mla::Layer{F},
+#single layers should implement backpropagation without storage function.
+function backpropagate!{F}(mla::MLAlgorithm{F},
                            inp::AbstractArray,
                            oup::AbstractArray{F},
                            ouδ::AbstractArray{F},
@@ -167,8 +174,8 @@ macro import_interface()
     import ..inputs; import ..outputs; import ..parameters; import ..flatten!; import ..unflatten!
     import ..evaluate!; import ..hasbackpropagation; import ..backpropagate!
     #key type definitions in the interface
-    import ..MLAlgorithm; import ..Layer; import ..VoidableDeltas
-    import ..Storage; import ..BackpropStorage; import ..DropoutStorage
+    import ..MLAlgorithm; import ..VoidableDeltas
+    import ..Storage; import ..nolayers; import ..BackpropStorage; import ..DropoutStorage
     #dropout stuff
     import ..hasdropout; import ..generate_dropout_storage;
     import ..dropout!; import ..restore!
@@ -183,7 +190,7 @@ end
 include("./math/math.jl")
 
 #subtypes
-include("./FCL/FCL.jl") #fully connected layer
+include("./FCT/FCT.jl") #fully connected layer
 include("./MLP/MLP.jl") #multilayer perceptrons
 
 #include general optimizers

@@ -8,7 +8,7 @@ import ..Math.d
   end
 
   #for analysis purposes, allow the backpropagation of a single layer.
-  if mlmodel <: Layer
+  if nolayers(mlmodel)
     quote
       #TODO:  Add support for this.
       throw(ArgumentError("single layer backprop has not been implemented yet."))
